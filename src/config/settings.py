@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'authentication',
-    'rest_framework_simplejwt'
+    'rest_framework_simplejwt',
+    'rest_framework_simplejwt.token_blacklist'
 ]
 
 MIDDLEWARE = [
@@ -162,3 +163,5 @@ SIMPLE_JWT = {
     "TOKEN_TYPE_CLAIM": "token_type",
     "AUTH_HEADER_TYPES": ("Bearer",),
 }
+
+FRONTEND_HOST = '127.0.0.1'
