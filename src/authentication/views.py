@@ -4,17 +4,19 @@ from django.contrib.auth import get_user_model
 from .serializers import CreateUserSerializer,UserLoginSerializer,LogoutRequestSerializer
 from rest_framework.response import Response
 from .helpers import validation_error_handler, AuthHelper
+from .tokens import account_activation_token
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
-from django.confg import settings
+from django.conf import settings
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from rest_framework_simplejwt.token_blacklist.models import OutstandingToken, BlacklistedToken
+from django.utils.encoding import force_bytes, force_str
+from django.contrib.auth.hashers import check_password 
+from rest_framework_simplejwt.views import TokenRefreshView
 
+User = get_user_model()
 
-
-User = get_user_mode()
-
-class SignupApiView(APIView):
+class SignupView(APIView):
 
     serializer_class = CreateUserSerializer
 
@@ -227,3 +229,20 @@ class UserLogoutView(APIView):
                 "code" : "token_not valid"
 
             },status=status.HTTP_401_UNAUTHORIZED)
+
+class CustomTokenRefreshView(TokenRefreshView):
+    # serializer_class = CustomTokenRefreshSerializer
+
+    def post(self, request, *args, **kwargs):
+        return super().post(request, *args, **kwargs)
+
+
+class ProfileView(APIView):
+    permission_classes = [IsAuthenticated]
+    def get(self, request, *args, **kwargs):
+
+        return Response({
+            "name" : "Nagaraj Murgod",
+            "image" : "dummy.png",
+            "address" : "earth"
+        })
