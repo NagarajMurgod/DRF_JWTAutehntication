@@ -1,10 +1,10 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
 from django.contrib.auth import get_user_model
-from .serializers import CreateUserSerializer,UserLoginSerializer,LogoutRequestSerializer
+from .serializers import CreateUserSerializer,UserLoginSerializer,LogoutRequestSerializer, ForgotPasswordResetSerializer, ForgotPasswordSerializer
 from rest_framework.response import Response
 from .helpers import validation_error_handler, AuthHelper
-from .tokens import account_activation_token
+from .tokens import account_activation_token, forogtoPasswordTokenGenerator
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from django.conf import settings
@@ -13,6 +13,7 @@ from rest_framework_simplejwt.token_blacklist.models import OutstandingToken, Bl
 from django.utils.encoding import force_bytes, force_str
 from django.contrib.auth.hashers import check_password 
 from rest_framework_simplejwt.views import TokenRefreshView
+from django.contrib.auth.tokens import default_token_generator
 
 User = get_user_model()
 
@@ -235,6 +236,71 @@ class CustomTokenRefreshView(TokenRefreshView):
 
     def post(self, request, *args, **kwargs):
         return super().post(request, *args, **kwargs)
+
+
+class ForgotPasswordView(APIView):
+    serializer_class = ForgotPasswordResetSerializer
+
+    def post(self, request, *args, **kwargs):
+        request_data = request.data
+        serializer = self.serializer_class(data=requested_data)
+
+        if serializer.is_valid() is False:
+            return Response({
+                "status" : "error",
+                "message" : validation_error_handler(serializer.errors),
+                "payload" : {
+                    "errors" : serializer.errors
+                }
+            },status=status.HTTP_400_BAD_REQUEST)
+        
+        email = serializer.validated_data["email"]
+
+        user = User.objects.filter(email=email).first()
+
+        uid, token = forogtoPasswordTokenGenerator(user)
+
+        context_data = {
+            "host" : settings.FRONTEND_HOST,
+            "uid" :uid,
+            "token" : token,
+            "protocol" : "http"
+        }
+
+        print("forgot password reset link" , context_data)
+
+
+        return Response({
+            "status" : "success",
+            "message" : "Password reset link is sent your email",
+            "payload" : {}
+        })
+
+
+class VarifyPasswordResetLink(APIView):
+ 
+    def get(self, request, uid, token):
+
+        try:
+            uid = force_str(urlsafe_base64_decode(uidb64))
+            user = User.objects.get(id=uid)
+        except Exception as e:
+            user = None
+        
+        if user and default_token_generator.check_token(user, token):
+            return Response({
+                "status" : "success",
+                "message" : "User can set the password",
+                "payload" : {}
+            }, status=status.HTTP_200_OK)
+        
+        return Response({
+            "status" : "error",
+            "message": "Password reset link is expired",
+            "payload" : {}
+        },status=status.HTTP_400_BAD_REQUEST)
+        
+
 
 
 class ProfileView(APIView):

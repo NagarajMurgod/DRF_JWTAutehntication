@@ -24,12 +24,12 @@ class CreateUserSerializer(serializers.ModelSerializer):
             }
         }
 
-        def validate_password(self, value):
-            validate_password(value)
-            return value
-        
-        def validate_email(self, value):
-            return value.lower()
+    def validate_password(self, value):
+        validate_password(value)
+        return value
+    
+    def validate_email(self, value):
+        return value.lower()
 
 
 class UserLoginSerializer(serializers.ModelSerializer):
@@ -65,8 +65,8 @@ class UserLoginSerializer(serializers.ModelSerializer):
         }
 
 
-        def validate_username_or_email(self,value):
-            return value.lower()
+    def validate_username_or_email(self,value):
+        return value.lower()
 
 
 class LogoutRequestSerializer(serializers.Serializer):
@@ -85,6 +85,34 @@ class LogoutRequestSerializer(serializers.Serializer):
         return super().validate(attrs)
 
 
+class ForgotPasswordSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
+    def validate_email(self, value):
+        user = User.objects.filter(email=value).first()
+
+        if user is None or user.is_active :
+            raise serializers.ValidationError("This Email is not registered")
+
+        return value
+
+
+class ForgotPasswordResetSerializer(serializers.Serializer):
+    new_password = serializers.CharField(write_only=True)
+    confirm_password = serializers.CharField(write_only=True)
+
+    def validate(self, attrs):
+        new_password = attrs["new_password"]
+        confirm_password = attrs["confirm_password"]
+
+        if new_password != confirm_password:
+            raise serializers.ValidationError("Password must match")
+        
+        validate_password(new_passowrd)
+        return super().validate(attrs)
+
+
+        
 
 class CustomTokenRefreshSerializer(TokenRefreshSerializer):
     def validate(self, attrs):
