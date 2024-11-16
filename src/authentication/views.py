@@ -291,13 +291,15 @@ class ForgotPasswordReset(APIView):
             user = None
         
         if user and default_token_generator.check_token(user, token):
-            serializer = self.serializer_class(data=request.data)
+            serializer = self.serializer_class(data=request.data, context={"user" : user})
 
             if serializer.is_valid() is False:
                 return Response({
                     "status" : "Error",
                     "message" : validation_error_handler(serializer.errors),
-                    "payload" : {}
+                    "payload" : {
+                        "errors" : serializer.errors
+                    }
                 }, status = status.HTTP_400_BAD_REQUEST)
             
             new_password = serializer.validated_data["new_password"]

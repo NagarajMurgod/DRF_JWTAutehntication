@@ -108,6 +108,9 @@ class ForgotPasswordResetSerializer(serializers.Serializer):
         if new_password != confirm_password:
             raise serializers.ValidationError("Password must match")
         
+        if self.context.get("user").check_password(new_password):
+            raise serializers.ValidationError("New password is same as old password")
+        
         validate_password(new_password)
         return super().validate(attrs)
 

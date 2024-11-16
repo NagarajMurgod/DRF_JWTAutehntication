@@ -36,10 +36,11 @@ class AuthHelper:
 def validation_error_handler(data):
     key = list(data.keys())[0]
     value = data[key]
-
+    print(value, key)
     if type(value) == list:
-        message = f"{key} : {value[0]}"
+        message = f"{value[0]}"
+
     else:
-        message = f"{key} : {value}"
+        message = f"{value}"
     
     return message
