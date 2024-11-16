@@ -91,7 +91,7 @@ class ForgotPasswordSerializer(serializers.Serializer):
     def validate_email(self, value):
         user = User.objects.filter(email=value).first()
 
-        if user is None or user.is_active :
+        if user is None or not user.is_active :
             raise serializers.ValidationError("This Email is not registered")
 
         return value
@@ -108,7 +108,7 @@ class ForgotPasswordResetSerializer(serializers.Serializer):
         if new_password != confirm_password:
             raise serializers.ValidationError("Password must match")
         
-        validate_password(new_passowrd)
+        validate_password(new_password)
         return super().validate(attrs)
 
 

@@ -231,6 +231,7 @@ class UserLogoutView(APIView):
 
             },status=status.HTTP_401_UNAUTHORIZED)
 
+
 class CustomTokenRefreshView(TokenRefreshView):
     # serializer_class = CustomTokenRefreshSerializer
 
@@ -239,11 +240,11 @@ class CustomTokenRefreshView(TokenRefreshView):
 
 
 class ForgotPasswordView(APIView):
-    serializer_class = ForgotPasswordResetSerializer
+    serializer_class = ForgotPasswordSerializer
 
     def post(self, request, *args, **kwargs):
         request_data = request.data
-        serializer = self.serializer_class(data=requested_data)
+        serializer = self.serializer_class(data=request_data)
 
         if serializer.is_valid() is False:
             return Response({
@@ -277,9 +278,11 @@ class ForgotPasswordView(APIView):
         })
 
 
-class VarifyPasswordResetLink(APIView):
- 
-    def get(self, request, uid, token):
+class ForgotPasswordReset(APIView):
+    
+    serializer_class = ForgotPasswordResetSerializer
+
+    def post(self, request, uidb64, token):
 
         try:
             uid = force_str(urlsafe_base64_decode(uidb64))
@@ -288,19 +291,31 @@ class VarifyPasswordResetLink(APIView):
             user = None
         
         if user and default_token_generator.check_token(user, token):
+            serializer = self.serializer_class(data=request.data)
+
+            if serializer.is_valid() is False:
+                return Response({
+                    "status" : "Error",
+                    "message" : validation_error_handler(serializer.errors),
+                    "payload" : {}
+                }, status = status.HTTP_400_BAD_REQUEST)
+            
+            new_password = serializer.validated_data["new_password"]
+            user.set_password(new_password)
+            user.save()
+
             return Response({
                 "status" : "success",
-                "message" : "User can set the password",
+                "message" : "Successfully reset the password.",
                 "payload" : {}
-            }, status=status.HTTP_200_OK)
+            }, status = status.HTTP_200_OK)
         
         return Response({
             "status" : "error",
             "message": "Password reset link is expired",
             "payload" : {}
-        },status=status.HTTP_400_BAD_REQUEST)
+        },status = status.HTTP_400_BAD_REQUEST)
         
-
 
 
 class ProfileView(APIView):
