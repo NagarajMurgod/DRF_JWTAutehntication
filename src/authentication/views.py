@@ -14,6 +14,7 @@ from django.utils.encoding import force_bytes, force_str
 from django.contrib.auth.hashers import check_password 
 from rest_framework_simplejwt.views import TokenRefreshView
 from django.contrib.auth.tokens import default_token_generator
+from .throttle import forgotPasswordResetThrottle
 
 User = get_user_model()
 
@@ -241,6 +242,7 @@ class CustomTokenRefreshView(TokenRefreshView):
 
 class ForgotPasswordView(APIView):
     serializer_class = ForgotPasswordSerializer
+    throttle_classes = [forgotPasswordResetThrottle]
 
     def post(self, request, *args, **kwargs):
         request_data = request.data
