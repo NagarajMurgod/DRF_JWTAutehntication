@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from .helpers import validation_error_handler, AuthHelper
 from .tokens import account_activation_token, forogtoPasswordTokenGenerator
 from rest_framework import status
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.conf import settings
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from rest_framework_simplejwt.token_blacklist.models import OutstandingToken, BlacklistedToken
@@ -15,12 +15,17 @@ from django.contrib.auth.hashers import check_password
 from rest_framework_simplejwt.views import TokenRefreshView
 from django.contrib.auth.tokens import default_token_generator
 from .throttle import forgotPasswordResetThrottle
+from drf_spectacular.utils import extend_schema
+from rest_framework.generics import GenericAPIView 
 
 User = get_user_model()
 
-class SignupView(APIView):
 
+# class SignupView(APIView):
+class SignupView(GenericAPIView ):
+    
     serializer_class = CreateUserSerializer
+    permission_classes = [AllowAny]
 
     def post(self, request, *args,**kwargs):
         request_data = request.data
@@ -29,10 +34,10 @@ class SignupView(APIView):
         if serializer.is_valid() is False:
 
             return Response({
-                "status" : "Error",
+                "status" : "error",
                 "message": validation_error_handler(serializer.errors),
                 "payload" : {
-                    "errors" : serializers.errors
+                    "errors" : serializer.errors
                 }
             },status=status.HTTP_400_BAD_REQUEST)
         
@@ -79,7 +84,7 @@ class SignupView(APIView):
         print(context_data)
 
         return Response({
-            "stauts" : "success",
+            "status" : "success",
             "message" : "Sent account varification link to your email address",
             "payload" : {
                 **serializer_data,
@@ -116,7 +121,8 @@ class ActiveAccountView(APIView):
 
 
 
-class LoginView(APIView):
+# class LoginView(APIView):
+class LoginView(GenericAPIView ):
 
     serializer_class = UserLoginSerializer
 

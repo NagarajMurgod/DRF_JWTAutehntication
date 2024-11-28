@@ -41,7 +41,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'authentication',
     'rest_framework_simplejwt',
-    'rest_framework_simplejwt.token_blacklist'
+    'rest_framework_simplejwt.token_blacklist',
+    "drf_yasg",
 ]
 
 MIDDLEWARE = [
@@ -169,3 +170,16 @@ FRONTEND_HOST = '127.0.0.1'
 ALLOW_NEW_REFRESH_TOKENS_FOR_UNVERIFIED_USERS = False
 
 PASSWORD_RESET_TIMEOUT = 300
+
+
+SWAGGER_SETTINGS = {
+    "USE_SESSION_AUTH": True,
+    "SECURITY_DEFINITIONS": {
+        "Bearer": {"type": "apiKey", "name": "Authorization", "in": "header"}
+    },
+    "JSON_EDITOR": True
+}
+
+REDOC_SETTINGS = {
+    "LAZY_RENDERING": False
+}
