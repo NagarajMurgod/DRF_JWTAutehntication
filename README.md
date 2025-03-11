@@ -63,3 +63,10 @@ This project provides a JWT authentication system implemented with Django REST F
 | `/auth/forgotpassword/`               | `POST`  | Request a password reset link.                       |
 | `/auth/passwordreset/<uidb64>/<token>/`| `POST`  | Allows the user to reset their password by providing the uidb64 and reset token   |
 | `/auth/profile/`                      | `GET`   | View or update the authenticated user's profile.     |
+|  `/swagger/`                 | `GET` |  Access the Swagger api documentation |
+
+
+## Screenshots
+
+![](./images/api_doc4.png)
+
