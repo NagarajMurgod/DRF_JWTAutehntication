@@ -55,11 +55,11 @@ This project provides a JWT authentication system implemented with Django REST F
 
 | Endpoint                                   | Method  | Description                                          |
 |--------------------------------------------|---------|------------------------------------------------------|
-| `/api/auth/signup/`                       | `POST`  | Create a new user account.                           |
-| `/api/auth/activate/<uidb64>/<token>/`     | `GET`   | Activate a user account using a unique ID and token. |
-| `/api/auth/login/`                        | `POST`  | Login to obtain a JWT token.                         |
-| `/api/auth/logout/`                       | `POST`  | Logout the user and invalidate the JWT token.        |
-| `/api/auth/token/refresh/`                | `POST`  | Refresh the JWT token when it's expired.             |
-| `/api/auth/forgotpassword/`               | `POST`  | Request a password reset link.                       |
-| `/api/auth/passwordreset/<uidb64>/<token>/`| `POST`  | Reset the forgotten password using a unique token.  |
-| `/api/auth/profile/`                      | `GET`   | View or update the authenticated user's profile.     |
+| `/auth/signup/`                       | `POST`  | Used to create a new user account. Requires user details such as username, email, and password.                           |
+| `/auth/activate/<uidb64>/<token>/`     | `GET`   | Activates the user account using the unique uidb64 and token sent to the user's email upon registration. |
+| `/auth/login/`                        | `POST`  | Authenticates the user and returns a JWT token for sessionless authentication.                        |
+| `/auth/logout/`                       | `POST`  | Logout the user and invalidate the JWT token.        |
+| `/auth/token/refresh/`                | `POST`  | Refresh the JWT token when it's expired.             |
+| `/auth/forgotpassword/`               | `POST`  | Request a password reset link.                       |
+| `/auth/passwordreset/<uidb64>/<token>/`| `POST`  | Allows the user to reset their password by providing the uidb64 and reset token   |
+| `/auth/profile/`                      | `GET`   | View or update the authenticated user's profile.     |
